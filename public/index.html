@@ -56,6 +56,7 @@
       cursor: pointer;
       font-size: 14px;
       margin-right: 8px;
+      margin-bottom: 8px;
     }
     
     button:hover {
@@ -63,12 +64,46 @@
     }
     
     input, select, textarea {
-      width: 100%;
-      padding: 8px;
-      margin-bottom: 10px;
       border: 1px solid #ddd;
       border-radius: 4px;
+      padding: 8px;
+      margin-bottom: 10px;
       box-sizing: border-box;
+    }
+    
+    .form-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+    
+    .form-column {
+      flex: 1;
+      min-width: 200px;
+    }
+    
+    .form-field {
+      margin-bottom: 10px;
+    }
+    
+    .form-field label {
+      display: block;
+      margin-bottom: 3px;
+      font-weight: 500;
+    }
+    
+    .form-field.inline {
+      display: inline-block;
+      margin-right: 15px;
+    }
+    
+    .small-select {
+      width: 150px;
+    }
+    
+    .medium-select {
+      width: 200px;
     }
     
     .result-area {
@@ -97,6 +132,26 @@
     tr:nth-child(even) {
       background-color: #f9f9f9;
     }
+    
+    .tag-container {
+      margin-top: 5px;
+    }
+    
+    .tag-button {
+      display: inline-block;
+      background: #e9f0ff;
+      border: 1px solid #c0d3ff;
+      border-radius: 12px;
+      padding: 2px 8px;
+      margin-right: 5px;
+      margin-bottom: 5px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    
+    .tag-button:hover {
+      background: #d0e0ff;
+    }
   </style>
 </head>
 <body>
@@ -111,121 +166,111 @@
   
   <div class="card">
     <h2>Quick Actions</h2>
-    <button onclick="fetchProjects('Active')">Show Active Projects</button>
-    <button onclick="fetchProjects('Deferred')">Show Deferred Projects</button>
-    <button onclick="fetchNextActions()">Show Next Actions</button>
-    <button onclick="fetchWaitingOn()">Show Waiting On</button>
+    <div>
+      <button onclick="fetchProjects('Active')">Show Active Projects</button>
+      <button onclick="fetchProjects('Deferred')">Show Deferred Projects</button>
+      <button onclick="fetchProjects('Completed')">Show Completed Projects</button>
+    </div>
+    <div>
+      <button onclick="fetchNextActions('Active')">Show Active Actions</button>
+      <button onclick="fetchNextActions('Deferred')">Show Deferred Actions</button>
+      <button onclick="fetchNextActions('Completed')">Show Completed Actions</button>
+    </div>
+    <div>
+      <button onclick="fetchWaitingOn('Active')">Show Active Waiting</button>
+      <button onclick="fetchWaitingOn('Deferred')">Show Deferred Waiting</button>
+      <button onclick="fetchWaitingOn('Completed')">Show Completed Waiting</button>
+    </div>
+    <div>
+      <button onclick="fetchReferences('Active')">Show References</button>
+      <button onclick="fetchSomedayMaybe('Active')">Show Someday/Maybe</button>
+    </div>
   </div>
   
   <div class="card">
     <h2>Create New Item</h2>
     <form id="createForm">
-      <label for="type">Type:</label>
-      <select id="type" name="type" onchange="updateFormFields()">
-        <option value="Project">Project</option>
-        <option value="Next Action">Next Action</option>
-        <option value="Waiting On">Waiting On</option>
-        <option value="Reference">Reference</option>
-        <option value="Someday Maybe">Someday Maybe</option>
-      </select>
-      
-      <div id="projectFields">
-        <label for="projectTitle">Project Title:</label>
-        <input type="text" id="projectTitle" name="projectTitle" required>
+      <div class="form-row">
+        <div class="form-field" style="width:200px;">
+          <label for="type">Type:</label>
+          <select id="type" name="type" class="medium-select" onchange="updateFormFields()">
+            <option value="Project">Project</option>
+            <option value="Next Action">Next Action</option>
+            <option value="Waiting On">Waiting On</option>
+            <option value="Reference">Reference</option>
+            <option value="Someday Maybe">Someday Maybe</option>
+          </select>
+        </div>
         
-        <label for="projectStatus">Status:</label>
-        <select id="projectStatus" name="projectStatus">
-          <option value="Active">Active</option>
-          <option value="Deferred">Deferred</option>
-          <option value="Completed">Completed</option>
-        </select>
+        <div class="form-field" style="flex:1;">
+          <label id="titleLabel" for="title">Title:</label>
+          <input type="text" id="title" name="title" required style="width:100%;">
+        </div>
       </div>
       
-      <div id="nextActionFields" class="hidden">
-        <label for="naTitle">Next Action Title:</label>
-        <input type="text" id="naTitle" name="naTitle">
+      <div class="form-row">
+        <div class="form-field" style="width:150px;">
+          <label for="status">Status:</label>
+          <select id="status" name="status" class="small-select">
+            <option value="Active">Active</option>
+            <option value="Deferred">Deferred</option>
+            <option value="Completed">Completed</option>
+          </select>
+        </div>
         
-        <label for="naStatus">Status:</label>
-        <select id="naStatus" name="naStatus">
-          <option value="Active">Active</option>
-          <option value="Deferred">Deferred</option>
-          <option value="Completed">Completed</option>
-        </select>
+        <div class="form-field" style="width:150px;">
+          <label for="emotionalWeight">Emotional Weight:</label>
+          <select id="emotionalWeight" name="emotionalWeight" class="small-select">
+            <option value="Low">Low</option>
+            <option value="Medium">Medium</option>
+            <option value="High">High</option>
+          </select>
+        </div>
         
-        <label for="naProjectLink">Linked Project:</label>
-        <select id="naProjectLink" name="naProjectLink">
-          <option value="">-- None --</option>
-          <!-- Will be populated dynamically -->
-        </select>
+        <div class="form-field" style="width:150px;">
+          <label for="legacyImpact">Legacy Impact:</label>
+          <select id="legacyImpact" name="legacyImpact" class="small-select">
+            <option value="Low">Low</option>
+            <option value="Medium">Medium</option>
+            <option value="High">High</option>
+          </select>
+        </div>
+        
+        <div id="linkedProjectContainer" class="form-field hidden" style="flex:1;">
+          <label for="linkedProject">Linked Project:</label>
+          <select id="linkedProject" name="linkedProject" style="width:100%;">
+            <option value="">-- None --</option>
+            <!-- Will be populated dynamically -->
+          </select>
+        </div>
       </div>
       
-      <div id="waitingOnFields" class="hidden">
-        <label for="woTitle">Waiting On Title:</label>
-        <input type="text" id="woTitle" name="woTitle">
-        
-        <label for="woStatus">Status:</label>
-        <select id="woStatus" name="woStatus">
-          <option value="Active">Active</option>
-          <option value="Deferred">Deferred</option>
-          <option value="Completed">Completed</option>
-        </select>
-        
-        <label for="woProjectLink">Linked Project:</label>
-        <select id="woProjectLink" name="woProjectLink">
-          <option value="">-- None --</option>
-          <!-- Will be populated dynamically -->
-        </select>
-      </div>
-
-      <div id="referenceFields" class="hidden">
-        <label for="refTitle">Reference Title:</label>
-        <input type="text" id="refTitle" name="refTitle">
-        
-        <label for="refStatus">Status:</label>
-        <select id="refStatus" name="refStatus">
-          <option value="Active">Active</option>
-          <option value="Archived">Archived</option>
-        </select>
-        
-        <label for="refProjectLink">Linked Project:</label>
-        <select id="refProjectLink" name="refProjectLink">
-          <option value="">-- None --</option>
-          <!-- Will be populated dynamically -->
-        </select>
-      </div>
-
-      <div id="somedayMaybeFields" class="hidden">
-        <label for="smTitle">Someday Maybe Title:</label>
-        <input type="text" id="smTitle" name="smTitle">
-        
-        <label for="smStatus">Status:</label>
-        <select id="smStatus" name="smStatus">
-          <option value="Active">Active</option>
-          <option value="Dropped">Dropped</option>
-          <option value="Converted">Converted</option>
-        </select>
+      <div class="form-row">
+        <div class="form-field" style="flex:1;">
+          <label for="notes">Notes:</label>
+          <textarea id="notes" name="notes" rows="3" style="width:100%;"></textarea>
+        </div>
       </div>
       
-      <!-- Common fields for all types -->
-      <label for="notes">Notes:</label>
-      <textarea id="notes" name="notes" rows="3"></textarea>
-      
-      <label for="tags">Tags (comma separated):</label>
-      <input type="text" id="tags" name="tags">
-      
-      <label for="emotionalWeight">Emotional Weight:</label>
-      <select id="emotionalWeight" name="emotionalWeight">
-        <option value="Low">Low</option>
-        <option value="Medium">Medium</option>
-        <option value="High">High</option>
-      </select>
-      
-      <label for="legacyImpact">Legacy Impact:</label>
-      <select id="legacyImpact" name="legacyImpact">
-        <option value="Low">Low</option>
-        <option value="Medium">Medium</option>
-        <option value="High">High</option>
-      </select>
+      <div class="form-row">
+        <div class="form-field" style="flex:1;">
+          <label for="tags">Tags (comma separated):</label>
+          <input type="text" id="tags" name="tags" style="width:100%;">
+          <div class="tag-container" id="commonTags">
+            <!-- Common tags will be added here -->
+            <span class="tag-button" onclick="addTag('work')">work</span>
+            <span class="tag-button" onclick="addTag('personal')">personal</span>
+            <span class="tag-button" onclick="addTag('urgent')">urgent</span>
+            <span class="tag-button" onclick="addTag('important')">important</span>
+            <span class="tag-button" onclick="addTag('home')">home</span>
+            <span class="tag-button" onclick="addTag('office')">office</span>
+            <span class="tag-button" onclick="addTag('phone')">phone</span>
+            <span class="tag-button" onclick="addTag('email')">email</span>
+            <span class="tag-button" onclick="addTag('errands')">errands</span>
+            <span class="tag-button" onclick="addTag('meeting')">meeting</span>
+          </div>
+        </div>
+      </div>
       
       <button type="submit">Create Item</button>
     </form>
@@ -265,28 +310,93 @@
         // Normal interface load, fetch projects for the dropdown
         fetchProjectsForDropdown();
       }
+      
+      // Set up the form for the default selected type
+      updateFormFields();
     };
+    
+    // Add tag to the input field
+    function addTag(tag) {
+      const tagsInput = document.getElementById('tags');
+      const currentTags = tagsInput.value.trim();
+      
+      if (currentTags === '') {
+        tagsInput.value = tag;
+      } else {
+        // Check if tag already exists
+        const tagList = currentTags.split(',').map(t => t.trim());
+        if (!tagList.includes(tag)) {
+          tagsInput.value = currentTags + ', ' + tag;
+        }
+      }
+    }
     
     // Handle form field display based on selected type
     function updateFormFields() {
       const type = document.getElementById('type').value;
+      const titleInput = document.getElementById('title');
+      const titleLabel = document.getElementById('titleLabel');
+      const statusSelect = document.getElementById('status');
+      const linkedProjectContainer = document.getElementById('linkedProjectContainer');
       
-      document.getElementById('projectFields').classList.add('hidden');
-      document.getElementById('nextActionFields').classList.add('hidden');
-      document.getElementById('waitingOnFields').classList.add('hidden');
-      document.getElementById('referenceFields').classList.add('hidden');
-      document.getElementById('somedayMaybeFields').classList.add('hidden');
+      // Update title label based on type
+      switch(type) {
+        case 'Project':
+          titleLabel.textContent = 'Project Title:';
+          break;
+        case 'Next Action':
+          titleLabel.textContent = 'Next Action Title:';
+          break;
+        case 'Waiting On':
+          titleLabel.textContent = 'Waiting On Title:';
+          break;
+        case 'Reference':
+          titleLabel.textContent = 'Reference Title:';
+          break;
+        case 'Someday Maybe':
+          titleLabel.textContent = 'Someday/Maybe Title:';
+          break;
+      }
       
+      // Show linked project dropdown for everything except Projects
       if (type === 'Project') {
-        document.getElementById('projectFields').classList.remove('hidden');
-      } else if (type === 'Next Action') {
-        document.getElementById('nextActionFields').classList.remove('hidden');
-      } else if (type === 'Waiting On') {
-        document.getElementById('waitingOnFields').classList.remove('hidden');
-      } else if (type === 'Reference') {
-        document.getElementById('referenceFields').classList.remove('hidden');
-      } else if (type === 'Someday Maybe') {
-        document.getElementById('somedayMaybeFields').classList.remove('hidden');
+        linkedProjectContainer.classList.add('hidden');
+        
+        // Project status options
+        statusSelect.innerHTML = '';
+        ['Active', 'Deferred', 'Completed'].forEach(status => {
+          const option = document.createElement('option');
+          option.value = status;
+          option.textContent = status;
+          statusSelect.appendChild(option);
+        });
+      } else {
+        linkedProjectContainer.classList.remove('hidden');
+        
+        // Status options depend on type
+        statusSelect.innerHTML = '';
+        if (type === 'Reference') {
+          ['Active', 'Archived'].forEach(status => {
+            const option = document.createElement('option');
+            option.value = status;
+            option.textContent = status;
+            statusSelect.appendChild(option);
+          });
+        } else if (type === 'Someday Maybe') {
+          ['Active', 'Dropped', 'Converted'].forEach(status => {
+            const option = document.createElement('option');
+            option.value = status;
+            option.textContent = status;
+            statusSelect.appendChild(option);
+          });
+        } else {
+          ['Active', 'Deferred', 'Completed'].forEach(status => {
+            const option = document.createElement('option');
+            option.value = status;
+            option.textContent = status;
+            statusSelect.appendChild(option);
+          });
+        }
       }
     }
     
@@ -296,27 +406,17 @@
         const response = await fetch('/items?Initial_Type=Project');
         const projects = await response.json();
         
-        const naProjectSelect = document.getElementById('naProjectLink');
-        const woProjectSelect = document.getElementById('woProjectLink');
-        const refProjectSelect = document.getElementById('refProjectLink');
+        const linkedProjectSelect = document.getElementById('linkedProject');
         
         // Clear existing options except the first one
-        naProjectSelect.innerHTML = '<option value="">-- None --</option>';
-        woProjectSelect.innerHTML = '<option value="">-- None --</option>';
-        refProjectSelect.innerHTML = '<option value="">-- None --</option>';
+        linkedProjectSelect.innerHTML = '<option value="">-- None --</option>';
         
         // Add each project as an option
         projects.forEach(project => {
           const option = document.createElement('option');
           option.value = project.Prefix_UUID;
           option.textContent = project.P_Title;
-          
-          const optionClone1 = option.cloneNode(true);
-          const optionClone2 = option.cloneNode(true);
-          
-          naProjectSelect.appendChild(option);
-          woProjectSelect.appendChild(optionClone1);
-          refProjectSelect.appendChild(optionClone2);
+          linkedProjectSelect.appendChild(option);
         });
       } catch (err) {
         console.error('Error fetching projects:', err);
@@ -342,12 +442,17 @@
     }
     
     // Fetch and display next actions
-    async function fetchNextActions() {
+    async function fetchNextActions(status) {
       try {
-        const response = await fetch('/items?Initial_Type=Next Action');
+        let url = '/items?Initial_Type=Next Action';
+        if (status) {
+          url += '&Status=' + status;
+        }
+        
+        const response = await fetch(url);
         const actions = await response.json();
         
-        displayNextActions(actions);
+        displayNextActions(actions, status);
       } catch (err) {
         document.getElementById('resultsOutput').innerHTML = 
           '<p class="error">Error fetching next actions: ' + err.message + '</p>';
@@ -355,15 +460,56 @@
     }
     
     // Fetch and display waiting on items
-    async function fetchWaitingOn() {
+    async function fetchWaitingOn(status) {
       try {
-        const response = await fetch('/items?Initial_Type=Waiting On');
+        let url = '/items?Initial_Type=Waiting On';
+        if (status) {
+          url += '&Status=' + status;
+        }
+        
+        const response = await fetch(url);
         const waitingItems = await response.json();
         
-        displayWaitingOn(waitingItems);
+        displayWaitingOn(waitingItems, status);
       } catch (err) {
         document.getElementById('resultsOutput').innerHTML = 
           '<p class="error">Error fetching waiting on items: ' + err.message + '</p>';
+      }
+    }
+    
+    // Fetch and display references
+    async function fetchReferences(status) {
+      try {
+        let url = '/items?Initial_Type=Reference';
+        if (status) {
+          url += '&Status=' + status;
+        }
+        
+        const response = await fetch(url);
+        const references = await response.json();
+        
+        displayReferences(references, status);
+      } catch (err) {
+        document.getElementById('resultsOutput').innerHTML = 
+          '<p class="error">Error fetching references: ' + err.message + '</p>';
+      }
+    }
+    
+    // Fetch and display someday/maybe items
+    async function fetchSomedayMaybe(status) {
+      try {
+        let url = '/items?Initial_Type=Someday Maybe';
+        if (status) {
+          url += '&Status=' + status;
+        }
+        
+        const response = await fetch(url);
+        const items = await response.json();
+        
+        displaySomedayMaybe(items, status);
+      } catch (err) {
+        document.getElementById('resultsOutput').innerHTML = 
+          '<p class="error">Error fetching someday/maybe items: ' + err.message + '</p>';
       }
     }
     
@@ -382,8 +528,8 @@
       
       projects.forEach(project => {
         html += '<tr>' +
-          '<td>' + project.P_Title + '</td>' +
-          '<td>' + project.P_Status + '</td>' +
+          '<td>' + (project.P_Title || '') + '</td>' +
+          '<td>' + (project.P_Status || 'Active') + '</td>' +
           '<td>' + (project.Tags || '') + '</td>' +
           '<td>' + (project.Emotional_Weight || 'Low') + '</td>' +
           '<td>' + (project.Legacy_Impact || 'Low') + '</td>' +
@@ -395,22 +541,22 @@
     }
     
     // Display next actions in a table
-    function displayNextActions(actions) {
+    function displayNextActions(actions, status) {
       const resultsDiv = document.getElementById('resultsOutput');
       
       if (actions.length === 0) {
-        resultsDiv.innerHTML = '<p>No next actions found.</p>';
+        resultsDiv.innerHTML = '<p>No ' + (status || '') + ' next actions found.</p>';
         return;
       }
       
-      let html = '<h3>Next Actions (' + actions.length + ')</h3>';
+      let html = '<h3>' + (status || 'All') + ' Next Actions (' + actions.length + ')</h3>';
       html += '<table>';
       html += '<tr><th>Title</th><th>Status</th><th>Linked Project</th><th>Tags</th></tr>';
       
       actions.forEach(action => {
         html += '<tr>' +
-          '<td>' + action.NA_Title + '</td>' +
-          '<td>' + action.NA_Status + '</td>' +
+          '<td>' + (action.NA_Title || '') + '</td>' +
+          '<td>' + (action.NA_Status || 'Active') + '</td>' +
           '<td>' + (action.Linked_Item || 'None') + '</td>' +
           '<td>' + (action.Tags || '') + '</td>' +
         '</tr>';
@@ -421,23 +567,74 @@
     }
     
     // Display waiting on items in a table
-    function displayWaitingOn(waitingItems) {
+    function displayWaitingOn(waitingItems, status) {
       const resultsDiv = document.getElementById('resultsOutput');
       
       if (waitingItems.length === 0) {
-        resultsDiv.innerHTML = '<p>No waiting on items found.</p>';
+        resultsDiv.innerHTML = '<p>No ' + (status || '') + ' waiting on items found.</p>';
         return;
       }
       
-      let html = '<h3>Waiting On (' + waitingItems.length + ')</h3>';
+      let html = '<h3>' + (status || 'All') + ' Waiting On (' + waitingItems.length + ')</h3>';
       html += '<table>';
       html += '<tr><th>Title</th><th>Status</th><th>Linked Project</th><th>Tags</th></tr>';
       
       waitingItems.forEach(item => {
         html += '<tr>' +
-          '<td>' + item.W_Title + '</td>' +
-          '<td>' + item.W_Status + '</td>' +
+          '<td>' + (item.W_Title || '') + '</td>' +
+          '<td>' + (item.W_Status || 'Active') + '</td>' +
           '<td>' + (item.Linked_Item || 'None') + '</td>' +
+          '<td>' + (item.Tags || '') + '</td>' +
+        '</tr>';
+      });
+      
+      html += '</table>';
+      resultsDiv.innerHTML = html;
+    }
+    
+    // Display references in a table
+    function displayReferences(references, status) {
+      const resultsDiv = document.getElementById('resultsOutput');
+      
+      if (references.length === 0) {
+        resultsDiv.innerHTML = '<p>No ' + (status || '') + ' references found.</p>';
+        return;
+      }
+      
+      let html = '<h3>' + (status || 'All') + ' References (' + references.length + ')</h3>';
+      html += '<table>';
+      html += '<tr><th>Title</th><th>Status</th><th>Linked Project</th><th>Tags</th></tr>';
+      
+      references.forEach(item => {
+        html += '<tr>' +
+          '<td>' + (item.R_Title || '') + '</td>' +
+          '<td>' + (item.R_Status || 'Active') + '</td>' +
+          '<td>' + (item.Linked_Item || 'None') + '</td>' +
+          '<td>' + (item.Tags || '') + '</td>' +
+        '</tr>';
+      });
+      
+      html += '</table>';
+      resultsDiv.innerHTML = html;
+    }
+    
+    // Display someday/maybe items in a table
+    function displaySomedayMaybe(items, status) {
+      const resultsDiv = document.getElementById('resultsOutput');
+      
+      if (items.length === 0) {
+        resultsDiv.innerHTML = '<p>No ' + (status || '') + ' someday/maybe items found.</p>';
+        return;
+      }
+      
+      let html = '<h3>' + (status || 'All') + ' Someday/Maybe (' + items.length + ')</h3>';
+      html += '<table>';
+      html += '<tr><th>Title</th><th>Status</th><th>Tags</th></tr>';
+      
+      items.forEach(item => {
+        html += '<tr>' +
+          '<td>' + (item.SM_Title || '') + '</td>' +
+          '<td>' + (item.SM_Status || 'Active') + '</td>' +
           '<td>' + (item.Tags || '') + '</td>' +
         '</tr>';
       });
@@ -451,6 +648,10 @@
       e.preventDefault();
       
       const type = document.getElementById('type').value;
+      const title = document.getElementById('title').value;
+      const status = document.getElementById('status').value;
+      const linkedProject = document.getElementById('linkedProject').value;
+      
       let payload = {
         Initial_Type: type,
         Notes: document.getElementById('notes').value,
@@ -460,24 +661,30 @@
       };
       
       // Add type-specific fields
-      if (type === 'Project') {
-        payload.P_Title = document.getElementById('projectTitle').value;
-        payload.P_Status = document.getElementById('projectStatus').value;
-      } else if (type === 'Next Action') {
-        payload.NA_Title = document.getElementById('naTitle').value;
-        payload.NA_Status = document.getElementById('naStatus').value;
-        payload.Linked_Item = document.getElementById('naProjectLink').value;
-      } else if (type === 'Waiting On') {
-        payload.W_Title = document.getElementById('woTitle').value;
-        payload.W_Status = document.getElementById('woStatus').value;
-        payload.Linked_Item = document.getElementById('woProjectLink').value;
-      } else if (type === 'Reference') {
-        payload.R_Title = document.getElementById('refTitle').value;
-        payload.R_Status = document.getElementById('refStatus').value;
-        payload.Linked_Item = document.getElementById('refProjectLink').value;
-      } else if (type === 'Someday Maybe') {
-        payload.SM_Title = document.getElementById('smTitle').value;
-        payload.SM_Status = document.getElementById('smStatus').value;
+      switch(type) {
+        case 'Project':
+          payload.P_Title = title;
+          payload.P_Status = status;
+          break;
+        case 'Next Action':
+          payload.NA_Title = title;
+          payload.NA_Status = status;
+          payload.Linked_Item = linkedProject;
+          break;
+        case 'Waiting On':
+          payload.W_Title = title;
+          payload.W_Status = status;
+          payload.Linked_Item = linkedProject;
+          break;
+        case 'Reference':
+          payload.R_Title = title;
+          payload.R_Status = status;
+          payload.Linked_Item = linkedProject;
+          break;
+        case 'Someday Maybe':
+          payload.SM_Title = title;
+          payload.SM_Status = status;
+          break;
       }
       
       try {
@@ -489,21 +696,16 @@
         
         const result = await response.json();
         
-        if (response.ok) {
-          // Refresh dropdowns and display success
-          fetchProjectsForDropdown();
-          document.getElementById('resultsOutput').innerHTML = 
-            '<p class="success">✅ Item created successfully!</p>' +
-            '<pre>' + JSON.stringify(result, null, 2) + '</pre>';
-          
-          // Reset form
-          document.getElementById('createForm').reset();
-          updateFormFields();
-        } else {
-          // Display error
-          document.getElementById('resultsOutput').innerHTML = 
-            '<p class="error">Error: ' + result.error + '</p>';
-        }
+        // Refresh dropdowns and display success
+        fetchProjectsForDropdown();
+        
+        document.getElementById('resultsOutput').innerHTML = 
+          '<p class="success">✅ Item created successfully!</p>' +
+          '<pre>' + JSON.stringify(result, null, 2) + '</pre>';
+        
+        // Reset form
+        document.getElementById('createForm').reset();
+        updateFormFields();
       } catch (err) {
         document.getElementById('resultsOutput').innerHTML = 
           '<p class="error">Error creating item: ' + err.message + '</p>';
@@ -543,17 +745,10 @@
           
           const result = await response.json();
           
-          if (response.ok) {
-            return {
-              success: true,
-              createdItem: result
-            };
-          } else {
-            return {
-              success: false,
-              error: result.error
-            };
-          }
+          return {
+            success: true,
+            createdItem: result
+          };
         }
         else {
           return {

@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -11,100 +12,103 @@
       padding: 20px;
       line-height: 1.6;
     }
-.card {
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 16px;
-  margin-bottom: 20px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-h1, h2, h3 {
-  color: #333;
-}
-
-pre {
-  background: #f5f5f5;
-  padding: 15px;
-  border-radius: 5px;
-  overflow-x: auto;
-  font-size: 14px;
-}
-
-.success {
-  color: green;
-  font-weight: bold;
-}
-
-.error {
-  color: red;
-  font-weight: bold;
-}
-
-.hidden {
-  display: none;
-}
-
-button {
-  background: #4a6cf7;
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-  margin-right: 8px;
-}
-
-button:hover {
-  background: #3451b2;
-}
-
-input, select, textarea {
-  width: 100%;
-  padding: 8px;
-  margin-bottom: 10px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  box-sizing: border-box;
-}
-
-.result-area {
-  margin-top: 20px;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 10px;
-}
-
-table, th, td {
-  border: 1px solid #ddd;
-}
-
-th, td {
-  padding: 10px;
-  text-align: left;
-}
-
-th {
-  background-color: #f5f5f5;
-}
-
-tr:nth-child(even) {
-  background-color: #f9f9f9;
-}
+    
+    .card {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    h1, h2, h3 {
+      color: #333;
+    }
+    
+    pre {
+      background: #f5f5f5;
+      padding: 15px;
+      border-radius: 5px;
+      overflow-x: auto;
+      font-size: 14px;
+    }
+    
+    .success {
+      color: green;
+      font-weight: bold;
+    }
+    
+    .error {
+      color: red;
+      font-weight: bold;
+    }
+    
+    .hidden {
+      display: none;
+    }
+    
+    button {
+      background: #4a6cf7;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      margin-right: 8px;
+    }
+    
+    button:hover {
+      background: #3451b2;
+    }
+    
+    input, select, textarea {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    
+    .result-area {
+      margin-top: 20px;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    
+    table, th, td {
+      border: 1px solid #ddd;
+    }
+    
+    th, td {
+      padding: 10px;
+      text-align: left;
+    }
+    
+    th {
+      background-color: #f5f5f5;
+    }
+    
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
   </style>
 </head>
 <body>
   <h1>GTD Commander Bridge</h1>
   <p>This interface allows both humans and AI assistants to interact with your GTD system.</p>
+  
   <div id="gptInterface" class="card hidden">
     <!-- This section only shows when accessed by GPT -->
     <h2>API Response</h2>
     <pre id="gptResponse">Processing request...</pre>
   </div>
+  
   <div class="card">
     <h2>Quick Actions</h2>
     <button onclick="fetchProjects('Active')">Show Active Projects</button>
@@ -112,6 +116,7 @@ tr:nth-child(even) {
     <button onclick="fetchNextActions()">Show Next Actions</button>
     <button onclick="fetchWaitingOn()">Show Waiting On</button>
   </div>
+  
   <div class="card">
     <h2>Create New Item</h2>
     <form id="createForm">
@@ -123,113 +128,116 @@ tr:nth-child(even) {
         <option value="Reference">Reference</option>
         <option value="Someday Maybe">Someday Maybe</option>
       </select>
-  <div id="projectFields">
-    <label for="projectTitle">Project Title:</label>
-    <input type="text" id="projectTitle" name="projectTitle" required>
-    
-    <label for="projectStatus">Status:</label>
-    <select id="projectStatus" name="projectStatus">
-      <option value="Active">Active</option>
-      <option value="Deferred">Deferred</option>
-      <option value="Completed">Completed</option>
-    </select>
-  </div>
-  
-  <div id="nextActionFields" class="hidden">
-    <label for="naTitle">Next Action Title:</label>
-    <input type="text" id="naTitle" name="naTitle">
-    
-    <label for="naStatus">Status:</label>
-    <select id="naStatus" name="naStatus">
-      <option value="Active">Active</option>
-      <option value="Deferred">Deferred</option>
-      <option value="Completed">Completed</option>
-    </select>
-    
-    <label for="naProjectLink">Linked Project:</label>
-    <select id="naProjectLink" name="naProjectLink">
-      <option value="">-- None --</option>
-      <!-- Will be populated dynamically -->
-    </select>
-  </div>
-  
-  <div id="waitingOnFields" class="hidden">
-    <label for="woTitle">Waiting On Title:</label>
-    <input type="text" id="woTitle" name="woTitle">
-    
-    <label for="woStatus">Status:</label>
-    <select id="woStatus" name="woStatus">
-      <option value="Active">Active</option>
-      <option value="Deferred">Deferred</option>
-      <option value="Completed">Completed</option>
-    </select>
-    
-    <label for="woProjectLink">Linked Project:</label>
-    <select id="woProjectLink" name="woProjectLink">
-      <option value="">-- None --</option>
-      <!-- Will be populated dynamically -->
-    </select>
-  </div>
+      
+      <div id="projectFields">
+        <label for="projectTitle">Project Title:</label>
+        <input type="text" id="projectTitle" name="projectTitle" required>
+        
+        <label for="projectStatus">Status:</label>
+        <select id="projectStatus" name="projectStatus">
+          <option value="Active">Active</option>
+          <option value="Deferred">Deferred</option>
+          <option value="Completed">Completed</option>
+        </select>
+      </div>
+      
+      <div id="nextActionFields" class="hidden">
+        <label for="naTitle">Next Action Title:</label>
+        <input type="text" id="naTitle" name="naTitle">
+        
+        <label for="naStatus">Status:</label>
+        <select id="naStatus" name="naStatus">
+          <option value="Active">Active</option>
+          <option value="Deferred">Deferred</option>
+          <option value="Completed">Completed</option>
+        </select>
+        
+        <label for="naProjectLink">Linked Project:</label>
+        <select id="naProjectLink" name="naProjectLink">
+          <option value="">-- None --</option>
+          <!-- Will be populated dynamically -->
+        </select>
+      </div>
+      
+      <div id="waitingOnFields" class="hidden">
+        <label for="woTitle">Waiting On Title:</label>
+        <input type="text" id="woTitle" name="woTitle">
+        
+        <label for="woStatus">Status:</label>
+        <select id="woStatus" name="woStatus">
+          <option value="Active">Active</option>
+          <option value="Deferred">Deferred</option>
+          <option value="Completed">Completed</option>
+        </select>
+        
+        <label for="woProjectLink">Linked Project:</label>
+        <select id="woProjectLink" name="woProjectLink">
+          <option value="">-- None --</option>
+          <!-- Will be populated dynamically -->
+        </select>
+      </div>
 
-  <div id="referenceFields" class="hidden">
-    <label for="refTitle">Reference Title:</label>
-    <input type="text" id="refTitle" name="refTitle">
-    
-    <label for="refStatus">Status:</label>
-    <select id="refStatus" name="refStatus">
-      <option value="Active">Active</option>
-      <option value="Archived">Archived</option>
-    </select>
-    
-    <label for="refProjectLink">Linked Project:</label>
-    <select id="refProjectLink" name="refProjectLink">
-      <option value="">-- None --</option>
-      <!-- Will be populated dynamically -->
-    </select>
-  </div>
+      <div id="referenceFields" class="hidden">
+        <label for="refTitle">Reference Title:</label>
+        <input type="text" id="refTitle" name="refTitle">
+        
+        <label for="refStatus">Status:</label>
+        <select id="refStatus" name="refStatus">
+          <option value="Active">Active</option>
+          <option value="Archived">Archived</option>
+        </select>
+        
+        <label for="refProjectLink">Linked Project:</label>
+        <select id="refProjectLink" name="refProjectLink">
+          <option value="">-- None --</option>
+          <!-- Will be populated dynamically -->
+        </select>
+      </div>
 
-  <div id="somedayMaybeFields" class="hidden">
-    <label for="smTitle">Someday Maybe Title:</label>
-    <input type="text" id="smTitle" name="smTitle">
-    
-    <label for="smStatus">Status:</label>
-    <select id="smStatus" name="smStatus">
-      <option value="Active">Active</option>
-      <option value="Dropped">Dropped</option>
-      <option value="Converted">Converted</option>
-    </select>
+      <div id="somedayMaybeFields" class="hidden">
+        <label for="smTitle">Someday Maybe Title:</label>
+        <input type="text" id="smTitle" name="smTitle">
+        
+        <label for="smStatus">Status:</label>
+        <select id="smStatus" name="smStatus">
+          <option value="Active">Active</option>
+          <option value="Dropped">Dropped</option>
+          <option value="Converted">Converted</option>
+        </select>
+      </div>
+      
+      <!-- Common fields for all types -->
+      <label for="notes">Notes:</label>
+      <textarea id="notes" name="notes" rows="3"></textarea>
+      
+      <label for="tags">Tags (comma separated):</label>
+      <input type="text" id="tags" name="tags">
+      
+      <label for="emotionalWeight">Emotional Weight:</label>
+      <select id="emotionalWeight" name="emotionalWeight">
+        <option value="Low">Low</option>
+        <option value="Medium">Medium</option>
+        <option value="High">High</option>
+      </select>
+      
+      <label for="legacyImpact">Legacy Impact:</label>
+      <select id="legacyImpact" name="legacyImpact">
+        <option value="Low">Low</option>
+        <option value="Medium">Medium</option>
+        <option value="High">High</option>
+      </select>
+      
+      <button type="submit">Create Item</button>
+    </form>
   </div>
   
-  <!-- Common fields for all types -->
-  <label for="notes">Notes:</label>
-  <textarea id="notes" name="notes" rows="3"></textarea>
-  
-  <label for="tags">Tags (comma separated):</label>
-  <input type="text" id="tags" name="tags">
-  
-  <label for="emotionalWeight">Emotional Weight:</label>
-  <select id="emotionalWeight" name="emotionalWeight">
-    <option value="Low">Low</option>
-    <option value="Medium">Medium</option>
-    <option value="High">High</option>
-  </select>
-  
-  <label for="legacyImpact">Legacy Impact:</label>
-  <select id="legacyImpact" name="legacyImpact">
-    <option value="Low">Low</option>
-    <option value="Medium">Medium</option>
-    <option value="High">High</option>
-  </select>
-  
-  <button type="submit">Create Item</button>
-</form>
-</div>
   <div class="card result-area">
     <h2>Results</h2>
     <div id="resultsOutput">
       <p>No items fetched yet. Use the buttons above to view your GTD items.</p>
     </div>
   </div>
+  
   <script>
     // Handle URL parameters for GPT requests
     window.onload = function() {
@@ -250,7 +258,7 @@ tr:nth-child(even) {
         } catch (err) {
           document.getElementById('gptResponse').textContent = JSON.stringify({
             success: false, 
-            error: `Failed to parse parameters: \${err.message}`
+            error: 'Failed to parse parameters: ' + err.message
           }, null, 2);
         }
       } else {
@@ -320,7 +328,7 @@ tr:nth-child(even) {
       try {
         let url = '/items?Initial_Type=Project';
         if (status) {
-          url += `&Status=\${status}`;
+          url += '&Status=' + status;
         }
         
         const response = await fetch(url);
@@ -329,7 +337,7 @@ tr:nth-child(even) {
         displayProjects(projects, status);
       } catch (err) {
         document.getElementById('resultsOutput').innerHTML = 
-          `<p class="error">Error fetching projects: \${err.message}</p>`;
+          '<p class="error">Error fetching projects: ' + err.message + '</p>';
       }
     }
     
@@ -342,7 +350,7 @@ tr:nth-child(even) {
         displayNextActions(actions);
       } catch (err) {
         document.getElementById('resultsOutput').innerHTML = 
-          `<p class="error">Error fetching next actions: \${err.message}</p>`;
+          '<p class="error">Error fetching next actions: ' + err.message + '</p>';
       }
     }
     
@@ -355,7 +363,7 @@ tr:nth-child(even) {
         displayWaitingOn(waitingItems);
       } catch (err) {
         document.getElementById('resultsOutput').innerHTML = 
-          `<p class="error">Error fetching waiting on items: \${err.message}</p>`;
+          '<p class="error">Error fetching waiting on items: ' + err.message + '</p>';
       }
     }
     
@@ -364,22 +372,22 @@ tr:nth-child(even) {
       const resultsDiv = document.getElementById('resultsOutput');
       
       if (projects.length === 0) {
-        resultsDiv.innerHTML = `<p>No \${status || ''} projects found.</p>`;
+        resultsDiv.innerHTML = '<p>No ' + (status || '') + ' projects found.</p>';
         return;
       }
       
-      let html = `<h3>\${status || 'All'} Projects (\${projects.length})</h3>`;
+      let html = '<h3>' + (status || 'All') + ' Projects (' + projects.length + ')</h3>';
       html += '<table>';
       html += '<tr><th>Title</th><th>Status</th><th>Tags</th><th>Emotional Weight</th><th>Legacy Impact</th></tr>';
       
       projects.forEach(project => {
-        html += `<tr>
-          <td>\${project.P_Title}</td>
-          <td>\${project.P_Status}</td>
-          <td>\${project.Tags || ''}</td>
-          <td>\${project.Emotional_Weight || 'Low'}</td>
-          <td>\${project.Legacy_Impact || 'Low'}</td>
-        </tr>`;
+        html += '<tr>' +
+          '<td>' + project.P_Title + '</td>' +
+          '<td>' + project.P_Status + '</td>' +
+          '<td>' + (project.Tags || '') + '</td>' +
+          '<td>' + (project.Emotional_Weight || 'Low') + '</td>' +
+          '<td>' + (project.Legacy_Impact || 'Low') + '</td>' +
+        '</tr>';
       });
       
       html += '</table>';
@@ -395,17 +403,17 @@ tr:nth-child(even) {
         return;
       }
       
-      let html = `<h3>Next Actions (\${actions.length})</h3>`;
+      let html = '<h3>Next Actions (' + actions.length + ')</h3>';
       html += '<table>';
       html += '<tr><th>Title</th><th>Status</th><th>Linked Project</th><th>Tags</th></tr>';
       
       actions.forEach(action => {
-        html += `<tr>
-          <td>\${action.NA_Title}</td>
-          <td>\${action.NA_Status}</td>
-          <td>\${action.Linked_Item || 'None'}</td>
-          <td>\${action.Tags || ''}</td>
-        </tr>`;
+        html += '<tr>' +
+          '<td>' + action.NA_Title + '</td>' +
+          '<td>' + action.NA_Status + '</td>' +
+          '<td>' + (action.Linked_Item || 'None') + '</td>' +
+          '<td>' + (action.Tags || '') + '</td>' +
+        '</tr>';
       });
       
       html += '</table>';
@@ -421,17 +429,17 @@ tr:nth-child(even) {
         return;
       }
       
-      let html = `<h3>Waiting On (\${waitingItems.length})</h3>`;
+      let html = '<h3>Waiting On (' + waitingItems.length + ')</h3>';
       html += '<table>';
       html += '<tr><th>Title</th><th>Status</th><th>Linked Project</th><th>Tags</th></tr>';
       
       waitingItems.forEach(item => {
-        html += `<tr>
-          <td>\${item.W_Title}</td>
-          <td>\${item.W_Status}</td>
-          <td>\${item.Linked_Item || 'None'}</td>
-          <td>\${item.Tags || ''}</td>
-        </tr>`;
+        html += '<tr>' +
+          '<td>' + item.W_Title + '</td>' +
+          '<td>' + item.W_Status + '</td>' +
+          '<td>' + (item.Linked_Item || 'None') + '</td>' +
+          '<td>' + (item.Tags || '') + '</td>' +
+        '</tr>';
       });
       
       html += '</table>';
@@ -485,80 +493,81 @@ tr:nth-child(even) {
           // Refresh dropdowns and display success
           fetchProjectsForDropdown();
           document.getElementById('resultsOutput').innerHTML = 
-            `<p class="success">✅ Item created successfully!</p>
-             <pre>\${JSON.stringify(result, null, 2)}</pre>`;
-      // Reset form
-      document.getElementById('createForm').reset();
-      updateFormFields();
-    } else {
-      // Display error
-      document.getElementById('resultsOutput').innerHTML = 
-        `<p class="error">Error: \${result.error}</p>`;
-    }
-  } catch (err) {
-    document.getElementById('resultsOutput').innerHTML = 
-      `<p class="error">Error creating item: \${err.message}</p>`;
-  }
-});
-
-// Handle GPT requests via URL parameters
-async function handleGptRequest(action, params) {
-  try {
-    if (action === 'getItems') {
-      // Build query string from params
-      const queryParams = new URLSearchParams();
-      if (params.Initial_Type) queryParams.append('Initial_Type', params.Initial_Type);
-      if (params.Status) queryParams.append('Status', params.Status);
-      
-      const queryString = queryParams.toString() ? `?\${queryParams.toString()}` : '';
-      const response = await fetch(`/items\${queryString}`);
-      const result = await response.json();
-      
-      return {
-        success: true,
-        items: result
-      };
-    } 
-    else if (action === 'createItem') {
-      // Validate required fields
-      if (!params.Initial_Type) {
-        return { success: false, error: 'Initial_Type is required' };
+            '<p class="success">✅ Item created successfully!</p>' +
+            '<pre>' + JSON.stringify(result, null, 2) + '</pre>';
+          
+          // Reset form
+          document.getElementById('createForm').reset();
+          updateFormFields();
+        } else {
+          // Display error
+          document.getElementById('resultsOutput').innerHTML = 
+            '<p class="error">Error: ' + result.error + '</p>';
+        }
+      } catch (err) {
+        document.getElementById('resultsOutput').innerHTML = 
+          '<p class="error">Error creating item: ' + err.message + '</p>';
       }
-      
-      // Make API call to create item
-      const response = await fetch('/items', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(params)
-      });
-      
-      const result = await response.json();
-      
-      if (response.ok) {
-        return {
-          success: true,
-          createdItem: result
-        };
-      } else {
+    });
+    
+    // Handle GPT requests via URL parameters
+    async function handleGptRequest(action, params) {
+      try {
+        if (action === 'getItems') {
+          // Build query string from params
+          const queryParams = new URLSearchParams();
+          if (params.Initial_Type) queryParams.append('Initial_Type', params.Initial_Type);
+          if (params.Status) queryParams.append('Status', params.Status);
+          
+          const queryString = queryParams.toString() ? '?' + queryParams.toString() : '';
+          const response = await fetch('/items' + queryString);
+          const result = await response.json();
+          
+          return {
+            success: true,
+            items: result
+          };
+        } 
+        else if (action === 'createItem') {
+          // Validate required fields
+          if (!params.Initial_Type) {
+            return { success: false, error: 'Initial_Type is required' };
+          }
+          
+          // Make API call to create item
+          const response = await fetch('/items', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(params)
+          });
+          
+          const result = await response.json();
+          
+          if (response.ok) {
+            return {
+              success: true,
+              createdItem: result
+            };
+          } else {
+            return {
+              success: false,
+              error: result.error
+            };
+          }
+        }
+        else {
+          return {
+            success: false,
+            error: 'Unknown action'
+          };
+        }
+      } catch (err) {
         return {
           success: false,
-          error: result.error
+          error: err.message
         };
       }
     }
-    else {
-      return {
-        success: false,
-        error: 'Unknown action'
-      };
-    }
-  } catch (err) {
-    return {
-      success: false,
-      error: err.message
-    };
-  }
-}
   </script>
 </body>
 </html>

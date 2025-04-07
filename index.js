@@ -17,25 +17,30 @@ app.use(express.static(path.join(__dirname, 'public')));
 // In-memory storage (will replace with database later)
 let items = [];
 
-// Load data if exists
-try {
-  if (fs.existsSync('./data.json')) {
-    const data = fs.readFileSync('./data.json', 'utf8');
-    items = JSON.parse(data);
-    console.log(`Loaded ${items.length} items from storage`);
+// Add request logging middleware
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.url}`);
+  if (req.method === 'POST') {
+    console.log('Request body:', JSON.stringify(req.body));
   }
+  next();
+});
+
+// Load data if exists - DISABLED FOR RAILWAY
+try {
+  console.log('Using in-memory storage only');
 } catch (err) {
-  console.error('Error loading data:', err);
+  console.error('Error:', err);
 }
 
-// Save data function
+// Save data function - DISABLED FOR RAILWAY
 function saveData() {
-  fs.writeFileSync('./data.json', JSON.stringify(items), 'utf8');
-  console.log(`Saved ${items.length} items to storage`);
+  console.log(`Items saved in memory only: ${items.length} items`);
 }
 
 // GET /items - Retrieve all items with optional filtering
 app.get('/items', (req, res) => {
+  console.log('GET /items query:', req.query);
   let result = [...items];
   
   // Apply filters if provided
@@ -53,52 +58,29 @@ app.get('/items', (req, res) => {
     });
   }
   
+  console.log(`Returning ${result.length} items`);
   res.json(result);
 });
 
 // POST /items - Create a new item
 app.post('/items', (req, res) => {
+  console.log('POST /items - Creating new item');
   const item = req.body;
   
   // Validate required fields
   if (!item.Initial_Type) {
+    console.log('Error: Missing Initial_Type');
     return res.status(400).json({ error: 'Initial_Type is required' });
   }
   
   // Validate item type
   const validTypes = ['Project', 'Next Action', 'Waiting On', 'Reference', 'Someday Maybe'];
   if (!validTypes.includes(item.Initial_Type)) {
+    console.log(`Error: Invalid Initial_Type: ${item.Initial_Type}`);
     return res.status(400).json({ error: 'Invalid Initial_Type value' });
   }
   
-  // Validate type-specific required fields
-  switch (item.Initial_Type) {
-    case 'Project':
-      if (!item.P_Title) {
-        return res.status(400).json({ error: 'P_Title is required for Projects' });
-      }
-      break;
-    case 'Next Action':
-      if (!item.NA_Title) {
-        return res.status(400).json({ error: 'NA_Title is required for Next Actions' });
-      }
-      break;
-    case 'Waiting On':
-      if (!item.W_Title) {
-        return res.status(400).json({ error: 'W_Title is required for Waiting On items' });
-      }
-      break;
-    case 'Reference':
-      if (!item.R_Title) {
-        return res.status(400).json({ error: 'R_Title is required for Reference items' });
-      }
-      break;
-    case 'Someday Maybe':
-      if (!item.SM_Title) {
-        return res.status(400).json({ error: 'SM_Title is required for Someday Maybe items' });
-      }
-      break;
-  }
+  console.log(`Creating item of type: ${item.Initial_Type}`);
   
   // Generate UUID and Prefix
   const uuid = uuidv4();
@@ -119,12 +101,17 @@ app.post('/items', (req, res) => {
     UUID: uuid
   };
   
+  // Log the item we're about to create
+  console.log('Creating item:', JSON.stringify(newItem));
+  
   // Add item to collection
   items.push(newItem);
   
   // Save data
   saveData();
   
+  // Success response
+  console.log('Item created successfully');
   res.json(newItem);
 });
 
@@ -215,44 +202,4 @@ app.get('/gpt', (req, res) => {
           case 'Next Action': prefix = 'NACT'; break;
           case 'Waiting On': prefix = 'WAIT'; break;
           case 'Reference': prefix = 'REF'; break;
-          case 'Someday Maybe': prefix = 'SDMB'; break;
-          default: prefix = 'OTHR';
-        }
-        
-        // Create new item with UUID
-        const newItem = {
-          ...gptParams,
-          Prefix_UUID: `${prefix}-${uuid.substring(0, 8)}`,
-          UUID: uuid
-        };
-        
-        // Add item to collection
-        items.push(newItem);
-        
-        // Save data
-        saveData();
-        
-        result = { success: true, createdItem: newItem };
-      }
-    }
-  }
-  
-  // Send response inside HTML (for GPT to parse)
-  const htmlResponse = `
-    <!DOCTYPE html>
-    <html>
-    <head><title>GTD API Response</title></head>
-    <body>
-      <div id="gptResponse">${JSON.stringify(result)}</div>
-    </body>
-    </html>
-  `;
-  
-  res.send(htmlResponse);
-});
-
-// Start server
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+          case 'Someday Maybe': prefix = 'SDMB';
